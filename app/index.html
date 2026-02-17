@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Playwright Test Page</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+section { margin-bottom: 40px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+.hidden { display: none; }
+
+#modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#modal.hidden { display: none; }
+
+#modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+#drag-item {
+  width: 120px;
+  padding: 10px;
+  background: lightcoral;
+  cursor: grab;
+}
+
+#drop-zone {
+  width: 200px;
+  height: 100px;
+  border: 2px dashed #333;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#infinite-scroll {
+  height: 200px;
+  overflow-y: auto;
+  border: 1px solid #999;
+  padding: 10px;
+}
+
+.hover-menu { display: inline-block; position: relative; }
+.hover-content {
+  display: none;
+  position: absolute;
+  background: #eee;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+.hover-menu:hover .hover-content { display: block; }
+
+progress { width: 100%; }
+</style>
+</head>
+<body>
+
+<h1 id="page-title">Advanced Test Page</h1>
+
+<section>
+<h2>Модалка</h2>
+<button id="open-modal">Open modal</button>
+<div id="modal" class="hidden">
+  <div id="modal-content">
+    <p id="modal-text">This is modal</p>
+    <button id="close-modal">Close</button>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Drag & Drop</h2>
+<div id="drag-item" draggable="true">Move me</div>
+<div id="drop-zone">Drop here</div>
+<p id="drop-result"></p>
+</section>
+
+<section>
+<h2>Iframe</h2>
+<iframe id="test-iframe"></iframe>
+</section>
+
+<section>
+<h2>Fake Login</h2>
+<input id="login-user" placeholder="user">
+<input id="login-pass" type="password" placeholder="pass">
+<button id="login-btn">Login</button>
+<p id="login-result"></p>
+</section>
+
+<section>
+<h2>Dynamic Table</h2>
+<button id="add-row">Add row</button>
+<table border="1" id="data-table">
+<thead>
+<tr><th>ID</th><th>Name</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+</section>
+
+<section>
+<h2>Infinite Scroll</h2>
+<div id="infinite-scroll"></div>
+</section>
+
+<section>
+<h2>Hover Menu</h2>
+<div class="hover-menu">
+  Hover over me
+  <div class="hover-content" id="hover-text">
+    Hidden text
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Disabled Button</h2>
+<button id="enable-btn">Enable button</button>
+<button id="disabled-btn" disabled>Disabled button</button>
+</section>
+
+<section>
+<h2>Progress</h2>
+<button id="start-progress">Start</button>
+<progress id="progress-bar" value="0" max="100"></progress>
+</section>
+
+<section>
+<h2>LocalStorage</h2>
+<button id="save-storage">Save</button>
+<button id="load-storage">Load</button>
+<p id="storage-result"></p>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  // ---------- Modal ----------
+  const openModalBtn = document.getElementById("open-modal");
+  const closeModalBtn = document.getElementById("close-modal");
+  const modal = document.getElementById("modal");
+
+  openModalBtn.addEventListener("click", function () {
+    modal.classList.remove("hidden");
+  });
+
+  closeModalBtn.addEventListener("click", function () {
+    modal.classList.add("hidden");
+  });
+
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal) {
+      modal.classList.add("hidden");
+    }
+  });
+
+  // ---------- Drag & Drop ----------
+  const dragItem = document.getElementById("drag-item");
+  const dropZone = document.getElementById("drop-zone");
+  const dropResult = document.getElementById("drop-result");
+
+  dragItem.addEventListener("dragstart", function (e) {
+    e.dataTransfer.setData("text/plain", "dragged");
+  });
+
+  dropZone.addEventListener("dragover", function (e) {
+    e.preventDefault();
+  });
+
+  dropZone.addEventListener("drop", function (e) {
+    e.preventDefault();
+    dropResult.textContent = "Элемент успешно перенесен";
+  });
+
+  // ---------- Iframe ----------
+  const iframe = document.getElementById("test-iframe");
+  iframe.srcdoc = `
+    <html>
+      <body>
+        <button id="iframe-btn">Кнопка в iframe</button>
+        <script>
+          document.getElementById("iframe-btn").addEventListener("click", function() {
+            const p = document.createElement("p");
+            p.id = "iframe-text";
+            p.textContent = "Нажато";
+            document.body.appendChild(p);
+          });
+        <\/script>
+      </body>
+    </html>
+  `;
+
+  // ---------- Fake Login ----------
+  const loginBtn = document.getElementById("login-btn");
+  const loginUser = document.getElementById("login-user");
+  const loginPass = document.getElementById("login-pass");
+  const loginResult = document.getElementById("login-result");
+
+  loginBtn.addEventListener("click", function () {
+    if (loginUser.value === "admin" && loginPass.value === "1234") {
+      loginResult.textContent = "Успешный вход";
+    } else {
+      loginResult.textContent = "Ошибка входа";
+    }
+  });
+
+  // ---------- Dynamic Table ----------
+  const addRowBtn = document.getElementById("add-row");
+  const tableBody = document.querySelector("#data-table tbody");
+  let counter = 1;
+
+  addRowBtn.addEventListener("click", function () {
+    const row = document.createElement("tr");
+    row.innerHTML = "<td>" + counter + "</td><td>User " + counter + "</td>";
+    tableBody.appendChild(row);
+    counter++;
+  });
+
+  // ---------- Infinite Scroll ----------
+  const scrollBox = document.getElementById("infinite-scroll");
+  let scrollCount = 0;
+
+  function addScrollItem() {
+    const p = document.createElement("p");
+    scrollCount++;
+    p.textContent = "Item " + scrollCount;
+    scrollBox.appendChild(p);
+  }
+
+  for (let i = 0; i < 10; i++) addScrollItem();
+
+  scrollBox.addEventListener("scroll", function () {
+    if (scrollBox.scrollTop + scrollBox.clientHeight >= scrollBox.scrollHeight) {
+      for (let i = 0; i < 5; i++) addScrollItem();
+    }
+  });
+
+  // ---------- Enable Button ----------
+  const enableBtn = document.getElementById("enable-btn");
+  const disabledBtn = document.getElementById("disabled-btn");
+
+  enableBtn.addEventListener("click", function () {
+    disabledBtn.disabled = false;
+  });
+
+  // ---------- Progress ----------
+  const startProgressBtn = document.getElementById("start-progress");
+  const progressBar = document.getElementById("progress-bar");
+
+  startProgressBtn.addEventListener("click", function () {
+    let value = 0;
+    const interval = setInterval(function () {
+      value += 10;
+      progressBar.value = value;
+      if (value >= 100) clearInterval(interval);
+    }, 300);
+  });
+
+  // ---------- LocalStorage ----------
+  const saveBtn = document.getElementById("save-storage");
+  const loadBtn = document.getElementById("load-storage");
+  const storageResult = document.getElementById("storage-result");
+
+  saveBtn.addEventListener("click", function () {
+    localStorage.setItem("testKey", "SavedValue");
+  });
+
+  loadBtn.addEventListener("click", function () {
+    storageResult.textContent = localStorage.getItem("testKey");
+  });
+
+});
+</script>
+
+</body>
+</html>
