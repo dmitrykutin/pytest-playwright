@@ -1,6 +1,9 @@
 Test project using Playwright and pytest
 
-By run "pytest" it runs local server with test web-page app/index.html and perform test-case tests/test_page.py
+By run "pytest" it runs:
+- local server with test web-page app/index.html
+- fastAPI endpoint
+and performs test-cases at tests/ui/test_page.py and tests/api/test_hello_api.py
 
 Requirements
 - Python 3.10+
@@ -31,15 +34,17 @@ python -m pytest -q
 Run tests with a different browser
 
 ```
-python -m pytest -q --browser=firefox
+python -m pytest --browser=firefox
+or just try
+pytest
 ```
 
-Notes
-- The `run_server.py` script starts a local HTTP server on port 8000.
-- If port 8000 is already in use, the fixture will use the existing server.
+Notes for files
+- src/clients folder - for API client to work with in api-tests
+- src/pages folder - for page-objects classes to work with ui-tests
+- static/index.html - just static html file to use in ui tests (click on buttons etc.)
+- tests/api - tests to test api
+- tests/ui - tests to test ui
+- conftest.py - file with a lot of things - fixtures, run the ui web page and api endpoint
+- requirements.txt - file with libs you need to install to use the project
 
-Files
-- [conftest.py](conftest.py) — server auto-start and pytest configuration
-- [requirements.txt](requirements.txt) — project dependencies
-- [setup.ps1](setup.ps1) — Windows PowerShell setup script
-- [setup.sh](setup.sh) — macOS / Linux setup script
