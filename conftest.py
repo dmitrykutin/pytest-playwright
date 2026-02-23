@@ -1,13 +1,9 @@
 import pytest
-import threading
-import uvicorn
-import time
+import src.app.fastapi as fastapi
 from src.clients.api_main import APIClient
 from src.pages.main_page import MainPage
 from playwright.sync_api import sync_playwright
-from pathlib import Path
-from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
+from tests.utils.server import run_server
 
 # ----------------------------
 # Constants for the server. Will use it later when we start the server
@@ -17,62 +13,26 @@ BASE_URL = "http://localhost:8000/index.html"
 PORT = 8000
 DIRECTORY = "static"
 
-# Create a FastAPI to work with it later
-app = FastAPI()
-
-
-# Mount the static file static/index.html to the root URL (http://localhost:8000/index.html)
-# to have access to it in tests
-app.mount(
-    "/index.html", StaticFiles(directory=Path(DIRECTORY), html=True), name="static"
-)
-
-
-# Create a API endpoint in localhost:8000/api/hello
-# that returns a simple JSON response if we make GET request to it
-@app.get("/api/hello")
-def hello():
-    return {"message": "hello"}
-
 
 # ----------------------------
-# 1️⃣ Run server in background thread
+# 1️ - it's a fixture ('fixture' means that it can be used in tests, and it will run before the test starts).
+# Start the FastAPI server before running the tests, and stop it after all tests are done.
+# We use 'session' scope so that it runs once for the whole test session, and
 # ----------------------------
-
-
-# scope = "session" means the fixture will be run once a session for all tests.
-# autouse=True means that the fixture will be automatically used by all tests,
-# you don't need to add it as a parameter to your test functions.
 @pytest.fixture(scope="session", autouse=True)
 def start_server():
-    # Use uvicorn to run the FastAPI app in background thread
-    # "background thread" means that it will run in parallel with the tests,
-    # and it won't block the execution of the tests.
-
-    # first create a config for uvicorn with our app
-    # ("app" and "PORT" were created before), host, port, and log level
-    config = uvicorn.Config(app, host="0.0.0.0", port=PORT, log_level="warning")
-
-    # then create a server with that config
-    server = uvicorn.Server(config)
-
-    # create a thread to run the server,
-    # and set daemon=True so that it will automatically close
-    # when the main thread (the tests) finishes
-    thread = threading.Thread(target=server.run, daemon=True)
-    # start the server thread
-    thread.start()
-    # wait a little to start the server
-    time.sleep(0.5)
-    # return control to the tests, and when all tests are done,
-    # it returns back here, and it stops the server
+    # fastapi.create_app() creates the FastAPI app for both - static and API endpoint
+    app = fastapi.create_app()
+    # run_server takes the FastAPI app and the port number and starts the server
+    server = run_server(app, PORT)
+    # yield means that it will return control to the tests.
+    # but when tests are done, it will come back here and execute the code after (close the server).
     yield
-    # stop the server
     server.should_exit = True
 
 
 # ----------------------------
-# 2️⃣ Browser options, command line args, use like:
+# 2️ - Browser options, command line args, use like:
 # pytest --browser=chromium (but it's default, you don't need to use it) or
 # pytest --browser=firefox or
 # pytest --browser=webkit
@@ -93,7 +53,7 @@ def browser_name(request):
 
 
 # ----------------------------
-# 3️⃣ Playwright browser.
+# 3️ - Playwright browser. Just run the browser.
 # ----------------------------
 @pytest.fixture(scope="session")
 def browser(browser_name):
@@ -114,7 +74,7 @@ def browser(browser_name):
 
 
 # ----------------------------
-# 4️⃣ Page. It's opened a page in browser for each test, and closed after the test is done.
+# 4️ - Page. It's opened a page in browser for each test, and closed after the test is done.
 # ----------------------------
 @pytest.fixture
 def page(browser):
@@ -126,7 +86,7 @@ def page(browser):
 
 
 # ----------------------------
-# 5️⃣ Page Object. We create an instance of MainPage for each test,
+# 5 - Page Object. We create an instance of MainPage for each test,
 # and it uses the 'page' fixture.
 # If you have more page objects, you can create more fixtures
 # and use it like def login_test(main_page, login_page): and use methods from both page objects in the same test.
@@ -136,6 +96,8 @@ def main_page(page):
     return MainPage(page)
 
 
+# it's like page object for API. We can use methods in src/clients/api_main.py in our tests
+# look at tests/test_api.py for example of usage
 @pytest.fixture
 def api_client():
     return APIClient(BASE_URL_API)
