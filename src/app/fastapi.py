@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
@@ -25,5 +25,22 @@ def create_app():
     @app.get("/api/hello")
     def hello():
         return {"message": "hello"}
+
+    # Create an API endpoint in localhost:8000/api/data_type
+    # if we send GET request to it with parameter "value=10" it should answer
+    # {"data_type": "integer"}, the same for float and string
+    @app.get("/api/data_type")
+    def get_data(value: str = Query(...)):
+        try:
+            int(value)
+            return {"data_type": "integer"}
+        except ValueError:
+            pass
+        try:
+            float(value)
+            return {"data_type": "float"}
+        except ValueError:
+            pass
+        return {"data_type": "string"}
 
     return app

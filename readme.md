@@ -3,7 +3,7 @@ Test project using Playwright and pytest
 By run "pytest" it runs:
 - local server with test web-page app/index.html
 - fastAPI endpoint
-- performs test-cases at tests/ui/test_page.py and tests/api/test_hello_api.py
+- performs test-cases at tests/ui/ and tests/api/
 
 Requirements
 - Python 3.10+
@@ -55,4 +55,5 @@ Notes for files
     
 - conftest.py - fixtures, run the server, open browser, open browser tab for each test, pytest_adoption (arguments for terminal)
 - requirements.txt - file with libs you need to install to use the project
+- pytest.ini - settings for pytest run
 

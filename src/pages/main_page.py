@@ -18,6 +18,10 @@ class MainPage(BasePage):
         self.MODAL_OPEN_BTN = "#open-modal"
         self.MODAL_CLOSE_BTN = "#close-modal"
         self.MODAL = "#modal"
+
+        self.BUTTON_IF_IFRAME = "#iframe-button"
+        self.TEXT_IN_FRAME = "iframe-text"
+
         self.TABLE_ADD_ROW_BTN = "#add-row"
         self.TABLE_BODY = "#data-table tbody"
 
@@ -37,6 +41,18 @@ class MainPage(BasePage):
 
     def is_modal_visible(self):
         return self.is_visible(self.MODAL)
+
+    def click_iframe_button(self):
+        # Switch to the iframe context before clicking the button
+        self.page.frame_locator("#test-iframe").locator("#iframe-btn").click()
+
+    def get_text_from_iframe(self):
+        # return the text from the iframe after clicking the button
+        return (
+            self.page.frame_locator("#test-iframe")
+            .locator(f"#{self.TEXT_IN_FRAME}")
+            .inner_text()
+        )
 
     def add_table_row(self):
         self.click(self.TABLE_ADD_ROW_BTN)
