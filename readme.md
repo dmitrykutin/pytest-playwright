@@ -40,11 +40,19 @@ pytest
 ```
 
 Notes for files
-- src/clients folder - for API client to work with in api-tests
-- src/pages folder - for page-objects classes to work with ui-tests
-- static/index.html - just static html file to use in ui tests (click on buttons etc.)
-- tests/api - tests to test api
-- tests/ui - tests to test ui
-- conftest.py - file with a lot of things - fixtures, run the ui web page and api endpoint
+- src/
+  - clients/ folder - for API client to work with in api-tests
+  - pages/ folder - for page-objects classes to work with ui-tests
+  - app/
+    - fastapi.py - create FastAPI app
+- static/
+  - index.html - just static html file to use in ui tests (click on buttons etc.)
+- tests/
+  - utils/
+    - server.py - run the server in another thread (to not block main thread with tests)
+  - api - tests to test api
+  - ui - tests to test ui
+    
+- conftest.py - fixtures, run the server, open browser, open browser tab for each test, pytest_adoption (arguments for terminal)
 - requirements.txt - file with libs you need to install to use the project
 
