@@ -1,17 +1,16 @@
-from pages.base_page import BasePage
+from src.pages.base_page import BasePage
 
 
 # -----------------------------
 # MainPage class. This is our page object for the main page of our app.
-# It inherits from BasePage, so it has all the common methods like goto(), click(), is_visible(), etc.
-# It also has its own methods specific to the main page, like open_modal(), close_modal
+# It is inherited from BasePage class, so it has all the common methods like goto(), click(), is_visible(), etc.
+# It also has its own methods specific to the main page, like open_modal(), close_modal() etc.
 # -----------------------------
 
+
 class MainPage(BasePage):
-
-    # URL of the page we want to test
+    # URL of the page for this page object
     URL = "http://localhost:8000/index.html"
-
 
     # Selectors for elements on the page
     def __init__(self, page):
@@ -23,6 +22,7 @@ class MainPage(BasePage):
         self.TABLE_BODY = "#data-table tbody"
 
     # Method to open the page (inherited from BasePage class (base_page.py))
+    # but it uses the URL that defined in this class befre
     def goto(self):
         super().goto(self.URL)
 
