@@ -3,7 +3,7 @@ Test project using Playwright and pytest
 By run "pytest" it runs:
 - local server with test web-page app/index.html
 - fastAPI endpoint
-and performs test-cases at tests/ui/test_page.py and tests/api/test_hello_api.py
+- performs test-cases at tests/ui/test_page.py and tests/api/test_hello_api.py
 
 Requirements
 - Python 3.10+
