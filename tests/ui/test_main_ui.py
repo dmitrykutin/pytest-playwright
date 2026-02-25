@@ -6,6 +6,7 @@ import pytest
 # This is our one test file for testing main page (index.html)
 
 
+@pytest.mark.ui
 def test_open_modal(main_page):
     main_page.open_modal()
 
@@ -27,6 +28,7 @@ def test_open_modal(main_page):
 # so now we can run only tests with this mark
 # by running command like pytest -m iframe
 @pytest.mark.iframe
+@pytest.mark.ui
 def test_text_in_iframe(main_page):
     main_page.click_iframe_button()
     text = main_page.get_text_from_iframe()

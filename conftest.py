@@ -96,6 +96,19 @@ def main_page(page):
     return MainPage(page)
 
 
+# ----------------------------
+# 6 - Create a db fixture, it will create a new database connect
+# for each test session
+# and drop it after the tests are done
+# ----------------------------
+@pytest.fixture(scope="session")
+def db():
+    from src.db.connectDB import Database
+
+    db = Database()
+    yield db
+
+
 # it's like page object for API. We can use methods in src/clients/api_main.py in our tests
 # look at tests/test_api.py for example of usage
 @pytest.fixture

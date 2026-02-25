@@ -20,3 +20,10 @@ class APIClient:
             f"{self.base_url}/api/data_type", params={"value": value}
         )
         return response.json()
+
+    # method POST to create a user via /users endpoint
+    def create_user(self, first_name, last_name):
+        payload = {"first_name": first_name, "last_name": last_name}
+        print(payload)
+        response = requests.post(f"{self.base_url}/users", json=payload)
+        return response.json()
