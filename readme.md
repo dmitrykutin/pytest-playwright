@@ -43,6 +43,8 @@ Notes for files
 - src/
   - clients/ folder - for API client to work with in api-tests
   - pages/ folder - for page-objects classes to work with ui-tests
+  - db/
+  - - connectDB.py - class for DB connection and methods for working with db
   - app/
     - fastapi.py - create FastAPI app
 - static/
@@ -52,8 +54,11 @@ Notes for files
     - server.py - run the server in another thread (to not block main thread with tests)
   - api - tests to test api
   - ui - tests to test ui
+  - data/
+  - - a factory for creating a fake names for api test - test_create_user.py
     
 - conftest.py - fixtures, run the server, open browser, open browser tab for each test, pytest_adoption (arguments for terminal)
 - requirements.txt - file with libs you need to install to use the project
 - pytest.ini - settings for pytest run
+- database.db - a db (sqlite3) to store names for api test - test_create_user.py
 
