@@ -80,4 +80,14 @@ def create_app():
             },
         }
 
+    @app.get("/users")
+    def get_users(db: Database = Depends(get_db)):
+        # here get all users from the users table and return them in JSON response
+        # look at get_users method in connectDB.py
+        users = db.get_all_users()
+        return {
+            "message": "Users retrieved",
+            "data": users,
+        }
+
     return app

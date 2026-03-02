@@ -27,3 +27,8 @@ class APIClient:
         print(payload)
         response = requests.post(f"{self.base_url}/users", json=payload)
         return response.json()
+
+    # method GET to get all users via /users endpoint
+    def get_users(self):
+        response = requests.get(f"{self.base_url}/users")
+        return response.json()
