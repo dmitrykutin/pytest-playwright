@@ -5,16 +5,89 @@
   <meta charset="UTF-8">
   <title>Playwright Test Page</title>
   <style>
+    :root {
+      --bg-dark: #0f172a;
+      --bg-mid: #1e293b;
+      --card: #ffffff;
+      --accent: #60a5fa;
+    }
+
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
+      padding: 20px;
+      color: #0f172a;
+      background: radial-gradient(circle at top right, #dbeafe, #eff6ff 35%, #f8fafc 75%);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+      border-radius: 16px;
+      padding: 28px;
+      color: #e2e8f0;
+      background: linear-gradient(135deg, var(--bg-dark), var(--bg-mid));
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.22);
+    }
+
+    .hero h1 {
+      margin: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(2px);
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .hero::before {
+      width: 180px;
+      height: 180px;
+      background: rgba(96, 165, 250, 0.45);
+      right: -50px;
+      top: -50px;
+    }
+
+    .hero::after {
+      width: 130px;
+      height: 130px;
+      background: rgba(56, 189, 248, 0.3);
+      right: 60px;
+      bottom: -55px;
+      animation-delay: -3s;
+    }
+
+    @keyframes float {
+      0%,
+      100% {
+        transform: translateY(0px);
+      }
+
+      50% {
+        transform: translateY(-12px);
+      }
     }
 
     section {
       margin-bottom: 40px;
       padding: 15px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      border: 1px solid #dbe3ef;
+      border-radius: 12px;
+      background: var(--card);
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.07);
     }
 
     .hidden {
@@ -92,7 +165,10 @@
 
 <body>
 
-  <h1 id="page-title">Advanced Test Page</h1>
+  <header class="hero">
+    <h1 id="page-title">Advanced Test Page</h1>
+    <p>Interactive playground for UI and API checks with a refreshed visual style.</p>
+  </header>
 
   <section>
     <h2>Modal</h2>
