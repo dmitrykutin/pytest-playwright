@@ -1,3 +1,6 @@
+from datetime import datetime
+import os
+
 import pytest
 import src.app.fastapi as fastapi
 from src.clients.api_main import APIClient
@@ -12,6 +15,8 @@ BASE_URL_API = "http://localhost:8000"
 BASE_URL = "http://localhost:8000/index.html"
 PORT = 8000
 DIRECTORY = "static"
+SCREENSHOT_DIR = "screenshots"
+os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
 
 # ----------------------------
@@ -114,3 +119,38 @@ def db():
 @pytest.fixture
 def api_client():
     return APIClient(BASE_URL_API)
+
+
+# it's a hook, it needs for tests to make something before, after or during the tests
+# this hook we use to make screenshots if UI test is failed
+# or make log file if api test is failed
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+
+    outcome = yield
+    rep = outcome.get_result()
+
+    if rep.when == "call" and rep.failed:
+        page = item.funcargs.get("page")
+        if page:
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            screenshot_path = os.path.join(
+                SCREENSHOT_DIR, f"{item.name}_{timestamp}.png"
+            )
+            page.screenshot(path=screenshot_path)
+
+            if hasattr(rep, "extra"):
+                import pytest_html
+
+                rep.extra.append(pytest_html.extras.image(screenshot_path))
+
+        api_client = item.funcargs.get("api_client")
+        if api_client:
+            log_path = os.path.join(SCREENSHOT_DIR, f"{item.name}_api_log.txt")
+            with open(log_path, "w", encoding="utf-8") as f:
+                for entry in api_client.logs:
+                    f.write(f"{entry}\n")
+            if hasattr(rep, "extra"):
+                import pytest_html
+
+                rep.extra.append(pytest_html.extras.text(f"API logs: see {log_path}"))

@@ -33,3 +33,10 @@ def test_text_in_iframe(main_page):
     main_page.click_iframe_button()
     text = main_page.get_text_from_iframe()
     assert text == "Pressed"
+
+
+# this is a failing test,
+# to check if screenshot is saved in /screensots folder
+@pytest.mark.ui
+def test_error(main_page):
+    assert main_page.is_visible("#not_existed_element")
